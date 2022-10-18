@@ -25,4 +25,5 @@ public class Job {
     private Double earnings;
     private JobState jobState = JobState.NEW;
     private String freelancerId;
+    private String comment;
 }
