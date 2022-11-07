@@ -15,7 +15,7 @@ public class MongoTestController {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    @GetMapping("/testmongodb")
+    @GetMapping("/api/testmongodb")
     public ResponseEntity<String> testMongoDb() {
         try {
             // create test document
