@@ -15,6 +15,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Document("jobs")
 public class Job {
+
     @Id
     private String id;
     @NonNull

@@ -3,8 +3,11 @@ package ch.zhaw.freelancer4u.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,8 +36,24 @@ public class JobController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<Job>> getAllJob() {
-        List<Job> allJobs = jobRepository.findAll();
+    public ResponseEntity<Page<Job>> getAllJob(@RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer pageSize,
+            @RequestParam(required = false) Double min,
+            @RequestParam(required = false) Double max) {
+        page = page == null ? 1 : page;
+        pageSize = pageSize == null ? 4 : pageSize;
+
+        Page<Job> allJobs;
+        if (min != null && max != null) {
+
+            allJobs = jobRepository.findByEarningsBetween(min, max, PageRequest.of(page - 1, pageSize));
+        } else if (min != null) {
+            allJobs = jobRepository.findByEarningsGreaterThan(min, PageRequest.of(page - 1, pageSize));
+        } else {
+            allJobs = jobRepository.findAll(PageRequest.of(page - 1, pageSize));
+
+        }
+
         return new ResponseEntity<>(allJobs, HttpStatus.OK);
     }
 
@@ -56,5 +75,12 @@ public class JobController {
     @GetMapping("/byfreelancer")
     public ResponseEntity<List<JobFreelancerAggregationDTO>> getJobFreelancerAggregation() {
         return new ResponseEntity<>(jobRepository.getJobFreelancerAggregation(), HttpStatus.OK);
+    }
+
+    @DeleteMapping("")
+    public ResponseEntity<String> deleteAllJob() {
+
+        jobRepository.deleteAll();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("DELETED");
     }
 }
